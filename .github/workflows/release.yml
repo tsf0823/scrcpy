@@ -98,7 +98,7 @@ jobs:
           release/test_client.sh
 
   build-linux-x86_64:
-    runs-on: ubuntu-22.04
+    runs-on: [self-hosted, linux, x64]
     steps:
       - name: Check architecture
         run: |
