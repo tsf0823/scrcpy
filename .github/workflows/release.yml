@@ -125,6 +125,23 @@ jobs:
              libxkbcommon-dev libdrm-dev libva-dev libgbm-dev libgl1-mesa-dev libgles2-mesa-dev \
              libegl1-mesa-dev libdbus-1-dev libibus-1.0-dev libudev-dev libthai-dev \
              libwayland-dev
+             
+      - name: Fix C11 static_assert compatibility
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p = Path("app/src/server.c")
+          s = p.read_text()
+
+          old = "static_assert(sizeof(info->device_name) == SC_DEVICE_NAME_FIELD_LENGTH);"
+          new = '_Static_assert(sizeof(info->device_name) == SC_DEVICE_NAME_FIELD_LENGTH, "Device name field length mismatch");'
+
+          if old not in s:
+              raise SystemExit("Target static_assert not found")
+
+          p.write_text(s.replace(old, new, 1))
+          PY
 
       - name: Build
         run: release/build_linux.sh x86_64
